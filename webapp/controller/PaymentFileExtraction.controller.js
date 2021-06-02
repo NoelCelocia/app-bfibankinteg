@@ -212,7 +212,17 @@ sap.ui.define([
 			}).done(function (results) {
 				if (results) {
 					if (sRecord === "Batch") {
-						this.oMdlBatch.setJSON("{\"allbatch\" : " + JSON.stringify(results) + "}");
+						var oRecord = {};
+						oRecord.oRecord_Details = [];
+						var oRecordDetails = {};
+						for (var d = 0; d < results.length; d++) {
+							oRecordDetails.U_App_DocNum = results[d].U_App_DocNum;
+							oRecordDetails.U_App_SupplierName = results[d].U_App_SupplierName.replace('Ã', 'Ñ');
+							oRecordDetails.U_App_CreatedDate = results[d].U_App_CreatedDate;
+
+							oRecord.oRecord_Details.push(JSON.parse(JSON.stringify(oRecordDetails)));
+						}
+						this.oMdlBatch.setJSON("{\"allbatch\" : " + JSON.stringify(oRecord.oRecord_Details) + "}");
 						this.getView().setModel(this.oMdlBatch, "oMdlBatch");
 					} else {
 						this.oMdlBank.setJSON("{\"allpnbbank\" : " + JSON.stringify(results) + "}");
@@ -616,7 +626,7 @@ sap.ui.define([
 							
 							oPaymentInvoices.LineNum = 0;
 							oPaymentInvoices.DocEntry = this.oMdlAP.getData().allopenAP[i].DocEntry;
-							oPaymentInvoices.SumApplied = (Math.round(iSumApplied * 100) / 100); //2 decimal places
+							// oPaymentInvoices.SumApplied = (Math.round(iSumApplied * 100) / 100); //2 decimal places
 							oPaymentInvoices.AppliedFC = 0.0;
 							//oPaymentInvoices.AppliedSys = this.oMdlAP.getData().allopenAP[i].PaymentAmount; //55.0;
 							oPaymentInvoices.DocRate = 0.0;
@@ -636,8 +646,10 @@ sap.ui.define([
 							oPaymentInvoices.TotalDiscountSC = 0.0;
 
 							if(this.oMdlAP.getData().allopenAP[i].InvoiceType === 'APCM'){
+								oPaymentInvoices.SumApplied = ((Math.round(iSumApplied * 100) / 100) * -1); //2 decimal places
 								iTotal = iTotal - (Math.round(iSumApplied * 100) / 100);
 							}else{
+								oPaymentInvoices.SumApplied = (Math.round(iSumApplied * 100) / 100); //2 decimal places
 								iTotal = iTotal + (Math.round(iSumApplied * 100) / 100);
 							}	
 							//iTotal = iTotal + (Math.round(iSumApplied * 100) / 100);
@@ -709,9 +721,9 @@ sap.ui.define([
 								aDocEntries.push(a.docentry);
 							}
 						} while (m);
-						for (var i = 0; i < aDocEntries.length; i++) {
-							this.fUpdateDraft(aDocEntries[i]);
-						}
+						// for (var i = 0; i < aDocEntries.length; i++) {
+						// 	this.fUpdateDraft(aDocEntries[i]);
+						// }
 						this.fSavePostedDraft(aDocEntries, false);
 						this.fExportData(aDocEntries,"N");
 						sap.m.MessageToast.show("Successfully posted Draft Outgoing Payment!");
@@ -1120,7 +1132,7 @@ sap.ui.define([
 					if (this.oMdlAP.getData().allopenAP[d].Priority === this.oMdlAP.getData().allopenAP[ii].Priority
 						&& this.oMdlAP.getData().allopenAP[d].CardCode === this.oMdlAP.getData().allopenAP[ii].CardCode
 						&& this.oMdlAP.getData().allopenAP[d].DocDueDate === this.oMdlAP.getData().allopenAP[ii].DocDueDate) {
-							iTotalAmount = iTotalAmount + this.oMdlAP.getData().allopenAP[ii].DocTotal; //- this.oMdlAP.getData().allopenAP[ii].WTaxAmount;
+							iTotalAmount = iTotalAmount + (this.oMdlAP.getData().allopenAP[ii].InvoiceType === 'APCM' ? (this.oMdlAP.getData().allopenAP[ii].DocTotal*-1) : this.oMdlAP.getData().allopenAP[ii].DocTotal); //- this.oMdlAP.getData().allopenAP[ii].WTaxAmount;
 					}	
 				}	
 				this.oContent.Details = "D" + "~" + iTotalAmount.toFixed(2) + "~" + sPayeeName  + "~" + sAddress  + "~" + sAddress2
