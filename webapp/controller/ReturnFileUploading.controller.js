@@ -64,7 +64,7 @@ sap.ui.define([
 					record.CheckNum = arrRecord[2];
 					record.VoucherNum = arrRecord[3];
 					record.SupplierCode =arrRecord[5];
-					record.SupplierName = arrRecord[4];
+					record.SupplierName = arrRecord[4].replace('Ã', 'Ñ');
 					record.BankAccount = arrRecord[6];
 					record.PaymentDate = arrRecord[7];
 					record.CheckDate = arrRecord[8];
@@ -79,19 +79,20 @@ sap.ui.define([
 		PostOutGoingPayment: function(oEvent){
 			this.iRecordCount = this.oMdlUploading.getData().Uploading.length;
 			for (var d = 0; d < this.oMdlUploading.getData().Uploading.length ; d++) {
-				var sDocEntry;
-				var oRecord = {};
-				var oPaymentChecks = {};
-				var oPaymentInvoices = {};
-				var oCashFlowAssignments = {};
-				oRecord.PaymentChecks = [];
-				oRecord.PaymentInvoices = [];
-				oRecord.CashFlowAssignments = [];
-				var todayDate =new Date(Date.parse(this.oMdlUploading.getData().Uploading[d].PaymentDate));
-				var year = todayDate.getFullYear();
-				var month = todayDate.getMonth() + 1;
-				var date = todayDate.getDate();
-				var stringDate = `${year}-${month.toString().padStart(2,"0")}-${date.toString().padStart(2,"0")}`;
+				if(!this.fGetData(this.oMdlUploading.getData().Uploading[d].RefNum.replace(" ",""))){
+					var sDocEntry;
+					var oRecord = {};
+					var oPaymentChecks = {};
+					var oPaymentInvoices = {};
+					var oCashFlowAssignments = {};
+					oRecord.PaymentChecks = [];
+					oRecord.PaymentInvoices = [];
+					oRecord.CashFlowAssignments = [];
+					var todayDate =new Date(Date.parse(this.oMdlUploading.getData().Uploading[d].PaymentDate));
+					var year = todayDate.getFullYear();
+					var month = todayDate.getMonth() + 1;
+					var date = todayDate.getDate();
+					var stringDate = `${year}-${month.toString().padStart(2,"0")}-${date.toString().padStart(2,"0")}`;
 
 					//header
 					oRecord.DocDate = stringDate;
@@ -131,8 +132,9 @@ sap.ui.define([
 						oPaymentChecks.EndorsableCheckNo =  null;
 					
 					oRecord.PaymentChecks.push(oPaymentChecks);
-					//}
+
 				this.fUpdatePaymentDraft(oRecord,sDocEntry,d);
+				}
 			}
 		},
 		fUpdatePaymentDraft: function(oRecord,sDocEntry,iIndex){
@@ -198,6 +200,31 @@ sap.ui.define([
 					}
 				}
 			});
+		},
+		fGetData:function(DraftNo){
+			var isExist = false;
+			$.ajax({
+				url: "https://xs.biotechfarms.net/app_xsjs/ExecQuery.xsjs?dbName="+ this.sDataBase 
+				+"&procName=spAppBankIntegration&QUERYTAG=CheckIfPosted&VALUE1="+ DraftNo +"&VALUE2=&VALUE3=&VALUE4=",
+				type: "GET",
+				async: false,
+				dataType: "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader("Authorization", "Basic " + btoa("SYSTEM:P@ssw0rd805~"));
+				},
+				error: function (xhr, status, error) {
+					var Message = xhr.responseJSON["error"].message.value;			
+					sap.m.MessageToast.show(Message);
+					console.error(Message);
+				},
+				success: function (json) {},
+				context: this
+			}).done(function (results) {
+				if (results.length > 0) {
+					isExist = true;
+				}
+			});
+			return isExist;
 		}
 
 
