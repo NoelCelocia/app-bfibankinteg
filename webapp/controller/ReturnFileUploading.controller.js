@@ -64,7 +64,7 @@ sap.ui.define([
 					record.CheckNum = arrRecord[2];
 					record.VoucherNum = arrRecord[3];
 					record.SupplierCode =arrRecord[5];
-					record.SupplierName = arrRecord[4];
+					record.SupplierName = arrRecord[4].replace('Ã', 'Ñ');
 					record.BankAccount = arrRecord[6];
 					record.PaymentDate = arrRecord[7];
 					record.CheckDate = arrRecord[8];
@@ -78,20 +78,48 @@ sap.ui.define([
 		},
 		PostOutGoingPayment: function(oEvent){
 			this.iRecordCount = this.oMdlUploading.getData().Uploading.length;
+			this.oDraftData = {};
 			for (var d = 0; d < this.oMdlUploading.getData().Uploading.length ; d++) {
-				var sDocEntry;
-				var oRecord = {};
-				var oPaymentChecks = {};
-				var oPaymentInvoices = {};
-				var oCashFlowAssignments = {};
-				oRecord.PaymentChecks = [];
-				oRecord.PaymentInvoices = [];
-				oRecord.CashFlowAssignments = [];
-				var todayDate =new Date(Date.parse(this.oMdlUploading.getData().Uploading[d].PaymentDate));
-				var year = todayDate.getFullYear();
-				var month = todayDate.getMonth() + 1;
-				var date = todayDate.getDate();
-				var stringDate = `${year}-${month.toString().padStart(2,"0")}-${date.toString().padStart(2,"0")}`;
+				// this.oRecord = this.fGetData(this.oMdlUploading.getData().Uploading[d].RefNum.replace(" ",""));
+				if(!this.fGetData(this.oMdlUploading.getData().Uploading[d].RefNum.replace(" ",""))){
+					this.oDraftData = this.fGetDraftData(this.oMdlUploading.getData().Uploading[d].RefNum.replace(" ",""));
+					var sDocEntry;
+					var oRecord = {};
+					var oPaymentChecks = {};
+					var oPaymentInvoices = {};
+					var oCashFlowAssignments = {};
+					oRecord.PaymentChecks = [];
+					oRecord.PaymentInvoices = [];
+					oRecord.CashFlowAssignments = [];
+					var todayDate =new Date(Date.parse(this.oMdlUploading.getData().Uploading[d].PaymentDate));
+					var year = todayDate.getFullYear();
+					var month = todayDate.getMonth() + 1;
+					var date = todayDate.getDate();
+					var stringDate = `${year}-${month.toString().padStart(2,"0")}-${date.toString().padStart(2,"0")}`;
+
+					for (var i = 0; i < this.oDraftData.PaymentInvoices.length; i++) {
+						oPaymentInvoices.LineNum =  this.oDraftData.PaymentInvoices[i].LineNum;
+						oPaymentInvoices.DocEntry =this.oDraftData.PaymentInvoices[i].DocEntry;
+						oPaymentInvoices.SumApplied =(this.oDraftData.PaymentInvoices[i].InvoiceType === 'it_PurchaseCreditNote' ? (this.oDraftData.PaymentInvoices[i].SumApplied * -1) : this.oDraftData.PaymentInvoices[i].SumApplied) ;
+						// oPaymentInvoices.AppliedFC = this.oDraftData.PaymentInvoices[d].AppliedFC;
+						// oPaymentInvoices.DocRate =this.oDraftData.PaymentInvoices[d].DocRate;
+						// oPaymentInvoices.DocLine = this.oDraftData.PaymentInvoices[d].DocLine;
+						// oPaymentInvoices.InvoiceType = this.oDraftData.PaymentInvoices[d].InvoiceType;
+						// oPaymentInvoices.DiscountPercent = this.oDraftData.PaymentInvoices[d].DiscountPercent;
+						// oPaymentInvoices.PaidSum =this.oDraftData.PaymentInvoices[d].PaidSum;
+						// oPaymentInvoices.InstallmentId = this.oDraftData.PaymentInvoices[d].InstallmentId;
+						// oPaymentInvoices.LinkDate =this.oDraftData.PaymentInvoices[d].LinkDate;
+						// oPaymentInvoices.DistributionRule =this.oDraftData.PaymentInvoices[d].DistributionRule;
+						// oPaymentInvoices.DistributionRule2 = this.oDraftData.PaymentInvoices[d].DistributionRule3;
+						// oPaymentInvoices.DistributionRule3 = this.oDraftData.PaymentInvoices[d].DistributionRule3;
+						// oPaymentInvoices.DistributionRule4 = this.oDraftData.PaymentInvoices[d].DistributionRule4;
+						// oPaymentInvoices.DistributionRule5 = this.oDraftData.PaymentInvoices[d].DistributionRule5;
+						// oPaymentInvoices.TotalDiscount = this.oDraftData.PaymentInvoices[d].TotalDiscount;
+						// oPaymentInvoices.TotalDiscountFC = this.oDraftData.PaymentInvoices[d].TotalDiscountFC;
+						// oPaymentInvoices.TotalDiscountSC = this.oDraftData.PaymentInvoices[d].TotalDiscountSC;
+						oRecord.PaymentInvoices.push(JSON.parse(JSON.stringify(oPaymentInvoices)));
+					}
+
 
 					//header
 					oRecord.DocDate = stringDate;
@@ -131,8 +159,12 @@ sap.ui.define([
 						oPaymentChecks.EndorsableCheckNo =  null;
 					
 					oRecord.PaymentChecks.push(oPaymentChecks);
-					//}
+
 				this.fUpdatePaymentDraft(oRecord,sDocEntry,d);
+				}else{
+					console.log("Document Number :" + this.oMdlUploading.getData().Uploading[d].RefNum.replace(" ","") + " already posted in SAP!");
+					sap.m.MessageToast.show("Document Number :" + this.oMdlUploading.getData().Uploading[d].RefNum.replace(" ","") + " already posted in SAP!");
+				}
 			}
 		},
 		fUpdatePaymentDraft: function(oRecord,sDocEntry,iIndex){
@@ -198,6 +230,59 @@ sap.ui.define([
 					}
 				}
 			});
+		},
+		fGetData:function(DraftNo){
+			var isExist = false;
+			$.ajax({
+				url: "https://xs.biotechfarms.net/app_xsjs/ExecQuery.xsjs?dbName="+ this.sDataBase 
+				+"&procName=spAppBankIntegration&QUERYTAG=CheckIfPosted&VALUE1="+ DraftNo +"&VALUE2=&VALUE3=&VALUE4=",
+				type: "GET",
+				async: false,
+				dataType: "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader("Authorization", "Basic " + btoa("SYSTEM:P@ssw0rd805~"));
+				},
+				error: function (xhr, status, error) {
+					var Message = xhr.responseJSON["error"].message.value;			
+					sap.m.MessageToast.show(Message);
+					console.error(Message);
+				},
+				success: function (json) {},
+				context: this
+			}).done(function (results) {
+				if (results.length > 0) {
+					isExist = true;
+				}
+			});
+			return isExist;
+		},
+		fGetDraftData: function(sDocEntry){
+			var oDraftRecord = {};
+			$.ajax({
+
+				url: "https://sl-test.biotechfarms.net/b1s/v1/PaymentDrafts("+ sDocEntry + ")",
+				type: "GET",
+				contentType: "application/json",
+				xhrFields: {
+					withCredentials: true
+				},
+				async: false,
+				error: function (xhr, status, error) {
+					var Message = xhr.responseJSON["error"].message.value;	
+					AppUI5.fErrorLogs("PaymentDrafts","Post Outgoing","null","null",Message,"Bank Integ Payment Uploading",this.sUserCode,"null","null");			
+					sap.m.MessageToast.show(Message);
+					console.error(Message);
+				},
+				success: function (json) {
+				},
+				context: this
+
+			}).done(function (results) {
+				if (results) {
+					oDraftRecord = results;
+				}
+			});
+			return oDraftRecord;
 		}
 
 
