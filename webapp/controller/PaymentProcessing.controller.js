@@ -700,11 +700,8 @@ sap.ui.define([
 			this.sStatus = "Draft";
 			//Check if Existing
 			//this.deleteIfExisting();
-			if (this.onAddProcess()){
-				this.getView().byId("btnDraft").setEnabled(true);
-			}
-			
-			
+			this.onAddProcess();
+			this.getView().byId("btnDraft").setEnabled(true);
 		},
 		
 		deleteIfExisting: function(oDetailsCode,Type){
