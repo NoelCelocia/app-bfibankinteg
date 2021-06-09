@@ -854,6 +854,9 @@ sap.ui.define([
 			var CodeH = AppUI5.generateUDTCode("GetCode");
 			// var DocNum = AppUI5.generateUDTCode("GetDocNum");
 			var LastBatch = AppUI5.generateUDTCode("GetLastBatchOfDay");// - (aHeaderCode === 0 ? 0 : 1)
+			if (LastBatch === -1){
+				this.onAddProcess();
+			}
 			// if (LastBatch ==="0"){LastBatch =1;}
 			var pad = "000";
 			var result = (pad+LastBatch).slice(-pad.length);
