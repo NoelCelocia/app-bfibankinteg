@@ -60,16 +60,20 @@ sap.ui.define([
 				for (var d = 0; d < arrTxt.length ; d++) {
 					var arrRecord = arrTxt[d].split("~");
 
-					record.CheckAmount = arrRecord[1];
-					record.CheckNum = arrRecord[2];
-					record.VoucherNum = arrRecord[3];
-					record.SupplierCode =arrRecord[5];
-					record.SupplierName = arrRecord[4].replace('Ã', 'Ñ');
-					record.BankAccount = arrRecord[6];
-					record.PaymentDate = arrRecord[7];
-					record.CheckDate = arrRecord[8];
-					record.RefNum = arrRecord[9];
-					oData.push(JSON.parse(JSON.stringify(record)));
+					if (arrRecord.length > 1){
+						record.CheckAmount = arrRecord[1];
+						record.CheckNum = arrRecord[2];
+						record.VoucherNum = arrRecord[3];
+						record.SupplierCode =arrRecord[5];
+						record.SupplierName = arrRecord[4].replace('Ã', 'Ñ');
+						record.BankAccount = arrRecord[6];
+						record.PaymentDate = arrRecord[7];
+						record.CheckDate = arrRecord[8];
+						record.RefNum = arrRecord[9].replace(" ","");
+						oData.push(JSON.parse(JSON.stringify(record)));
+					}
+
+					
 				}
 				that.getView().getModel("oMdlUploading").setProperty("/Uploading", oData);
 			};
