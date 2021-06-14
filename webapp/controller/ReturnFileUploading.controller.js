@@ -238,13 +238,13 @@ sap.ui.define([
 		fGetData:function(DraftNo){
 			var isExist = false;
 			$.ajax({
-				url: "https://xs.biotechfarms.net/app_xsjs/ExecQuery.xsjs?dbName="+ this.sDataBase 
+				url: "https://xsjs.biotechfarms.net/app_xsjs/ExecQuery.xsjs?dbName="+ this.sDataBase 
 				+"&procName=spAppBankIntegration&QUERYTAG=CheckIfPosted&VALUE1="+ DraftNo +"&VALUE2=&VALUE3=&VALUE4=",
 				type: "GET",
 				async: false,
 				dataType: "json",
 				beforeSend: function (xhr) {
-					xhr.setRequestHeader("Authorization", "Basic " + btoa("SYSTEM:P@ssw0rd805~"));
+					xhr.setRequestHeader("Authorization", "Basic " + btoa("SYSTEM:Qwerty0987$"));
 				},
 				error: function (xhr, status, error) {
 					var Message = xhr.responseJSON["error"].message.value;			
@@ -264,7 +264,7 @@ sap.ui.define([
 			var oDraftRecord = {};
 			$.ajax({
 
-				url: "https://sl-test.biotechfarms.net/b1s/v1/PaymentDrafts("+ sDocEntry + ")",
+				url: "https://sl-eut.biotechfarms.net/b1s/v1/PaymentDrafts("+ sDocEntry + ")",
 				type: "GET",
 				contentType: "application/json",
 				xhrFields: {
