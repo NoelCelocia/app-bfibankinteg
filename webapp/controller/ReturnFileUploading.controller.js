@@ -238,7 +238,7 @@ sap.ui.define([
 		fGetData:function(DraftNo){
 			var isExist = false;
 			$.ajax({
-				url: "https://xsjs.biotechfarms.net/app_xsjs/ExecQuery.xsjs?dbName="+ this.sDataBase 
+				url: "https://xsjs.biotechfarms.net/app-xsjs/ExecQuery.xsjs?dbName="+ this.sDataBase 
 				+"&procName=spAppBankIntegration&QUERYTAG=CheckIfPosted&VALUE1="+ DraftNo +"&VALUE2=&VALUE3=&VALUE4=",
 				type: "GET",
 				async: false,
