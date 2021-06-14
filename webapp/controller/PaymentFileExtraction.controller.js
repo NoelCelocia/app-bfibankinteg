@@ -1127,7 +1127,6 @@ sap.ui.define([
 				var sInvoiceWHTAmount = "";
 				var sInvoiceVATAmount = "";
 				var sInvoiceNetAmount = this.oMdlAP.getData().allopenAP[d].DocTotal;
-
 				
 				for (var ii = d; ii < this.oMdlAP.getData().allopenAP.length; ii++) {
 					if (this.oMdlAP.getData().allopenAP[d].Priority === this.oMdlAP.getData().allopenAP[ii].Priority
