@@ -1136,7 +1136,7 @@ sap.ui.define([
 					}	
 				}	
 				this.oContent.Details = "D" + "~" + iTotalAmount.toFixed(2) + "~" + sPayeeName  + "~" + sAddress  + "~" + sAddress2
-										+ "~" + sTIN + "~" + sZipCode + "~" + sPayeeCode + "~" + sPNBAccountNo	+ "~" + sDocDueDate + "~" + sPrintingBranch
+										+ "~" + sTIN.substr(0, 15) + "~" + sZipCode + "~" + sPayeeCode + "~" + sPNBAccountNo	+ "~" + sDocDueDate + "~" + sPrintingBranch
 										+ "~" + sDispatchMode + "~" + sDispatchTo + "~" + sDispatchCode + "~" + sDispatchToName 
 										+ "~" + sFileRefNo + "~" + sWHTApplicable + "~" + sWHTTaxCode + "~" + sWHTTaxRate 
 										+ "~" + sVATApplicable + "~" + sWHTDateBaseAmount;
