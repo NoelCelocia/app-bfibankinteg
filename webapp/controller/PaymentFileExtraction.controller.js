@@ -1082,8 +1082,8 @@ sap.ui.define([
 					}
 				}
 				var iTotalCheck = 1;
-				var sPayeeName = this.oMdlAP.getData().allopenAP[d].CardName;
-				var splitAdd = this.oMdlAP.getData().allopenAP[d].Address;
+				var sPayeeName = this.oMdlAP.getData().allopenAP[d].CardName.replace('Ñ', 'N');
+				var splitAdd = this.oMdlAP.getData().allopenAP[d].Address.replace('Ñ', 'N');
 				var splitAdd2 = splitAdd.match(/.{1,50}/g); // split string every 50 char
 				var sAddress = (splitAdd2 === null || splitAdd2 === "null"  ? "" :  splitAdd2[0]);
 				var sAddress2 =  (splitAdd2 === null || splitAdd2 === "null" || splitAdd2[1] === undefined ? "" :  splitAdd2[1]);
