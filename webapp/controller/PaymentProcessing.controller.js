@@ -683,16 +683,6 @@ sap.ui.define([
 				sap.m.MessageToast.show("Please select line item/s!");
 				return false;
 			}else{
-				// for (var iCounter = 0; iCounter < this.oMdlAP.getData().allopenAP.length; iCounter++) {
-				// 	var InvoiceDate = this.oMdlAP.getData().allopenAP[iCounter].DocDate;
-				// 	var CheckDate = this.oMdlAP.getData().allopenAP[iCounter].DocDueDate.split("/");
-				// 	CheckDate = CheckDate[2] + CheckDate[0] + CheckDate[1];
-				// 	oT_PAYMENT_PROCESSING_D.U_App_CheckDate = CheckDate.split("undefined").join("");
-				// 	if(InvoiceDate > CheckDate){
-				// 		sap.m.MessageToast.show("Invoice Date is greater than Check Date. Please input later date!");
-				// 		return false;
-				// 	}
-				// }	
 				var iCounter,iCounter2,iRow;
 				for (iCounter = 0; iCounter < this.oMdlAP.getData().allopenAP.length; iCounter++) {
 					for (iCounter2 = 0; iCounter2 < selectedIndeices.length; iCounter2++) {
